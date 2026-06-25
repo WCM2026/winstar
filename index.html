@@ -37,38 +37,30 @@
   }
   body{
     font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-    background:#EDEAE2;
+    background:var(--white);
     color:var(--ink);
     min-height:100vh;
     display:flex;
     flex-direction:column;
-    align-items:center;
-    padding:32px 16px 60px;
   }
-  .page-title{
-    font-size:14px;
-    color:var(--ink-soft);
-    margin-bottom:20px;
-    text-align:center;
-    letter-spacing:.02em;
-  }
-  .page-title b{color:var(--red);}
-
   .device{
-    width:375px;
-    max-width:100%;
+    width:100%;
+    max-width:560px;
+    margin:0 auto;
     background:var(--white);
-    border-radius:36px;
-    box-shadow:0 24px 60px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.04);
     overflow:hidden;
     position:relative;
+    flex:1;
+    display:flex;
+    flex-direction:column;
   }
   .device-inner{
-    height:760px;
+    flex:1;
     display:flex;
     flex-direction:column;
     position:relative;
     overflow:hidden;
+    min-height:100vh;
   }
 
   .statusbar{
@@ -440,16 +432,12 @@
 </svg>
 
 
-<div class="page-title">WIN STAR — Demo giao diện <b>Giai đoạn 1</b> · bấm vào bottom tab bar để chuyển màn hình</div>
-
 <div class="device">
   <div class="device-inner">
 
     <!-- ============ LOGIN (đơn giản hóa: chỉ cần MSNV) ============ -->
     <div class="screen" id="screen-login" style="display:block;">
-      <div class="red-hero" style="padding-bottom:30px;">
-        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
-        <div style="display:flex;align-items:center;gap:8px;padding-top:14px;">
+      <div class="red-hero" style="padding-bottom:30px;">        <div style="display:flex;align-items:center;gap:8px;padding-top:14px;">
           <svg class="icon-svg" style="color:var(--gold-light);font-size:22px;"><use href="#icon-star" xlink:href="#icon-star"></use></svg>
           <span style="color:#fff;font-size:19px;font-weight:700;">WIN STAR</span>
         </div>
@@ -475,9 +463,7 @@
 
     <!-- ============ HOME ============ -->
     <div class="screen" id="screen-home" style="display:none;">
-      <div class="red-hero">
-        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;">
+      <div class="red-hero">        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <svg class="icon-svg" style="color:var(--gold-light);font-size:22px;"><use href="#icon-star" xlink:href="#icon-star"></use></svg>
             <span style="color:#fff;font-size:19px;font-weight:700;">WIN STAR</span>
@@ -544,9 +530,7 @@
 
     <!-- ============ WALLET ============ -->
     <div class="screen" id="screen-wallet" style="display:none;">
-      <div style="background:var(--red);">
-        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
-        <div class="topbar">
+      <div style="background:var(--red);">        <div class="topbar">
           <div class="back-btn" onclick="goTo('home')"><svg class="icon-svg"><use href="#icon-arrow-left" xlink:href="#icon-arrow-left"></use></svg></div>
           <div class="title">STAR Wallet</div>
           <div class="icon-btn"><svg class="icon-svg"><use href="#icon-clock" xlink:href="#icon-clock"></use></svg></div>
@@ -578,9 +562,7 @@
 
     <!-- ============ ACTIVITY ============ -->
     <div class="screen" id="screen-activity" style="display:none;">
-      <div style="background:var(--red);">
-        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
-        <div class="topbar">
+      <div style="background:var(--red);">        <div class="topbar">
           <div class="back-btn" onclick="goTo('home')"><svg class="icon-svg"><use href="#icon-arrow-left" xlink:href="#icon-arrow-left"></use></svg></div>
           <div class="title">Activity Center</div>
           <div class="icon-btn"><svg class="icon-svg"><use href="#icon-chart-bar" xlink:href="#icon-chart-bar"></use></svg></div>
@@ -606,9 +588,7 @@
 
     <!-- ============ LEADERBOARD ============ -->
     <div class="screen" id="screen-leaderboard" style="display:none;">
-      <div style="background:var(--red);">
-        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
-        <div class="topbar">
+      <div style="background:var(--red);">        <div class="topbar">
           <div class="back-btn" onclick="goTo('home')"><svg class="icon-svg"><use href="#icon-arrow-left" xlink:href="#icon-arrow-left"></use></svg></div>
           <div class="title">Leaderboard</div>
           <div class="icon-btn"><svg class="icon-svg"><use href="#icon-info-circle" xlink:href="#icon-info-circle"></use></svg></div>
@@ -630,9 +610,7 @@
 
     <!-- ============ MORE ============ -->
     <div class="screen" id="screen-more" style="display:none;">
-      <div class="more-header">
-        <div class="statusbar on-red" style="position:absolute;top:0;left:0;right:0;padding:10px 22px 0;"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
-        <div class="avatar" style="margin-top:20px;" id="more-avatar-initials">NA</div>
+      <div class="more-header">        <div class="avatar" style="margin-top:20px;" id="more-avatar-initials">NA</div>
         <div style="margin-top:20px;">
           <div class="name" id="more-name">—</div>
           <div class="dept" id="more-dept">—</div>
@@ -666,12 +644,6 @@
 
     <div class="toast" id="toast">Tính năng này thuộc Giai đoạn 2, chưa mở trong bản hiện tại.</div>
   </div>
-</div>
-
-<div class="legend">
-  <span><span class="dot" style="background:var(--green-text);"></span>Đã tham gia (đã cộng sao)</span>
-  <span><span class="dot" style="background:var(--gray-text);"></span>Sắp diễn ra / không tham gia</span>
-  <span><span class="dot" style="background:var(--amber-text);"></span>Khóa — thuộc Giai đoạn 2</span>
 </div>
 
 <script>
