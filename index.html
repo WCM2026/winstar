@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WIN STAR — Demo giao diện Giai đoạn 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+  :root{
+    --red:#C81E1E;
+    --red-dark:#A11717;
+    --red-darker:#7A1212;
+    --gold:#F5A623;
+    --gold-light:#FFD166;
+    --green:#1D9E75;
+    --green-bg:#EAF3DE;
+    --green-text:#27500A;
+    --amber-bg:#FAEEDA;
+    --amber-text:#854F0B;
+    --gray-bg:#F1EFE8;
+    --gray-text:#5F5E5A;
+    --ink:#2C2C2A;
+    --ink-soft:#6B6A66;
+    --hair:#E7E4DC;
+    --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  .icon-svg{
+    width:1em;height:1em;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    flex-shrink:0;
+    vertical-align:-0.125em;
+  }
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#EDEAE2;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 16px 60px;
+  }
+  .page-title{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+    text-align:center;
+    letter-spacing:.02em;
+  }
+  .page-title b{color:var(--red);}
+
+  .device{
+    width:375px;
+    max-width:100%;
+    background:var(--white);
+    border-radius:36px;
+    box-shadow:0 24px 60px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.04);
+    overflow:hidden;
+    position:relative;
+  }
+  .device-inner{
+    height:760px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .statusbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 22px 0;
+    font-size:13px;
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .statusbar.on-red{color:#fff;}
+  .statusbar.on-white{color:var(--ink);}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;font-size:14px;}
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 18px 16px;
+    flex-shrink:0;
+  }
+  .topbar .back-btn,.topbar .icon-btn{
+    width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;
+    background:rgba(255,255,255,0.12);
+  }
+  .topbar .title{flex:1;color:#fff;font-size:16px;font-weight:600;}
+  .topbar .badge-count{
+    position:absolute;top:-3px;right:-3px;
+    background:var(--gold);color:#fff;
+    font-size:9px;font-weight:700;
+    width:15px;height:15px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  .screen{
+    flex:1;
+    overflow-y:auto;
+    background:var(--white);
+    -ms-overflow-style:none;
+    scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar{display:none;}
+
+  .red-hero{
+    background:linear-gradient(180deg,var(--red) 0%, var(--red-dark) 70%, var(--red-darker) 100%);
+    padding:0 18px 56px;
+    position:relative;
+    overflow:hidden;
+  }
+  .red-hero::after{
+    content:"";
+    position:absolute;right:-30px;top:10px;
+    width:200px;height:200px;
+    background:radial-gradient(circle, rgba(255,209,102,0.22) 0%, transparent 70%);
+  }
+  .hero-tagline{position:relative;z-index:1;padding-top:6px;}
+  .hero-tagline .line1{color:#fff;font-size:21px;font-weight:700;line-height:1.3;}
+  .hero-tagline .line2{color:var(--gold-light);font-size:21px;font-weight:700;line-height:1.3;}
+  .hero-tagline .line3{color:rgba(255,255,255,0.92);font-size:13px;margin-top:4px;}
+
+  .pad{padding:16px 18px;}
+
+  .card{
+    background:var(--white);
+    border:1px solid var(--hair);
+    border-radius:16px;
+    padding:14px;
+  }
+  .card-shadow{box-shadow:0 10px 28px rgba(0,0,0,.10);}
+
+  .profile-card{
+    display:flex;align-items:center;gap:12px;
+    margin-top:-44px;position:relative;z-index:2;
+  }
+  .avatar{
+    width:48px;height:48px;border-radius:50%;
+    background:#FBEAF0;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#993556;font-size:15px;
+    flex-shrink:0;
+    overflow:hidden;
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .profile-card .name{font-size:14px;font-weight:600;}
+  .profile-card .dept{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .level-badge{
+    background:var(--amber-bg);color:var(--amber-text);
+    font-size:11px;font-weight:700;
+    padding:4px 10px;border-radius:8px;
+    display:flex;align-items:center;gap:3px;
+    white-space:nowrap;
+  }
+
+  .stat-row{display:flex;gap:10px;margin-top:12px;}
+  .stat-box{
+    flex:1;background:var(--gray-bg);border-radius:12px;
+    padding:11px 12px;text-align:center;
+  }
+  .stat-box .label{font-size:10.5px;color:var(--ink-soft);}
+  .stat-box .value{font-size:18px;font-weight:700;margin-top:3px;}
+
+  .section-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin:18px 0 10px;
+  }
+  .section-head .h{font-size:14px;font-weight:700;}
+  .section-head .see-all{font-size:11.5px;color:var(--red);font-weight:600;cursor:pointer;}
+
+  .shortcut-grid{display:flex;gap:10px;}
+  .shortcut{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+    cursor:pointer;
+  }
+  .shortcut .ic{
+    width:48px;height:48px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;font-size:21px;
+  }
+  .shortcut .lb{font-size:10.5px;color:var(--ink);text-align:center;font-weight:500;}
+  .shortcut.locked{opacity:.45;}
+
+  .activity-feature{
+    border-radius:14px;overflow:hidden;border:1px solid var(--hair);
+    display:flex;
+  }
+  .activity-feature .thumb{
+    width:84px;flex-shrink:0;
+    background:linear-gradient(135deg,#c9a87a,#8a6f4e);
+    position:relative;
+  }
+  .activity-feature .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .activity-feature .body{padding:10px 12px;flex:1;}
+  .activity-feature .tag{
+    font-size:9px;font-weight:700;color:var(--red);
+    background:#FAECE7;display:inline-block;padding:2px 6px;border-radius:5px;margin-bottom:4px;
+  }
+  .activity-feature .name{font-size:12.5px;font-weight:700;}
+  .activity-feature .meta{font-size:10.5px;color:var(--ink-soft);margin-top:3px;}
+  .activity-feature .note{font-size:10px;color:var(--ink-soft);margin-top:6px;}
+
+  .wallet-hero-card{
+    background:linear-gradient(135deg,var(--red),var(--red-darker));
+    border-radius:18px;color:#fff;padding:18px;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .wallet-hero-card .lbl{font-size:11px;opacity:.85;letter-spacing:.04em;}
+  .wallet-hero-card .amt{
+    font-size:30px;font-weight:700;margin:8px 0;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .wallet-hero-card .amt .coin{
+    width:30px;height:30px;border-radius:50%;
+    background:var(--gold-light);
+    display:flex;align-items:center;justify-content:center;
+    color:#8a5a00;font-size:15px;
+  }
+  .wallet-sub-row{display:flex;justify-content:space-around;font-size:11.5px;opacity:.92;margin-top:6px;}
+  .wallet-sub-row .up{color:var(--gold-light);font-weight:700;}
+
+  .tab-pills{display:flex;gap:8px;margin:14px 0 6px;}
+  .tab-pill{
+    flex:1;text-align:center;padding:9px 0;border-radius:10px;
+    font-size:12.5px;font-weight:600;cursor:pointer;
+    background:var(--gray-bg);color:var(--gray-text);
+  }
+  .tab-pill.active{background:var(--red);color:#fff;}
+
+  .history-item{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 0;border-bottom:1px solid var(--hair);
+  }
+  .history-item .ic-circle{
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:15px;
+    flex-shrink:0;
+  }
+  .history-item .info{flex:1;}
+  .history-item .t{font-size:12.5px;font-weight:600;}
+  .history-item .d{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
+  .history-item .delta{font-size:13px;font-weight:700;white-space:nowrap;}
+  .delta.pos{color:var(--green);}
+  .delta.neg{color:#A32D2D;}
+
+  .search-bar{
+    background:var(--gray-bg);border-radius:12px;
+    display:flex;align-items:center;gap:8px;
+    padding:10px 14px;font-size:12.5px;color:var(--ink-soft);
+  }
+
+  .filter-row{display:flex;gap:8px;margin:14px 0;overflow-x:auto;}
+  .filter-chip{
+    padding:7px 14px;border-radius:18px;font-size:11.5px;font-weight:600;
+    white-space:nowrap;cursor:pointer;
+    background:var(--gray-bg);color:var(--gray-text);
+  }
+  .filter-chip.active{background:var(--red);color:#fff;}
+
+  .activity-card{
+    border:1px solid var(--hair);border-radius:14px;overflow:hidden;margin-bottom:12px;
+    display:flex;
+  }
+  .activity-card .thumb{
+    width:78px;flex-shrink:0;
+    background:linear-gradient(135deg,#d2b48c,#7a5c3c);
+  }
+  .activity-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .activity-card .body{flex:1;padding:10px 12px;position:relative;}
+  .activity-card .name{font-size:12.5px;font-weight:700;}
+  .activity-card .star-chip{
+    position:absolute;top:10px;right:12px;
+    font-size:11px;font-weight:700;color:var(--amber-text);
+    display:flex;align-items:center;gap:3px;
+  }
+  .activity-card .meta{font-size:10.5px;color:var(--ink-soft);margin-top:5px;}
+  .activity-card .status-row{margin-top:8px;}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:4px;
+    font-size:10.5px;font-weight:700;padding:5px 11px;border-radius:8px;
+  }
+  .status-pill.confirmed{background:var(--green-bg);color:var(--green-text);}
+  .status-pill.upcoming{background:var(--gray-bg);color:var(--gray-text);}
+  .status-pill.none{background:var(--gray-bg);color:var(--gray-text);}
+
+  .stat-summary-row{display:flex;gap:10px;margin-bottom:14px;}
+
+  .lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin:18px 0 16px;}
+  .lb-podium .slot{display:flex;flex-direction:column;align-items:center;gap:6px;width:92px;}
+  .lb-podium .nm{font-size:11px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;}
+  .lb-podium .pic{
+    width:58px;height:58px;border-radius:50%;
+    background:#FBEAF0;display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:#993556;font-size:18px;position:relative;
+    border:3px solid var(--gold-light);
+  }
+  .lb-podium .slot.gold .pic{width:70px;height:70px;border-color:var(--gold);font-size:21px;}
+  .lb-podium .crown{position:absolute;top:-16px;font-size:16px;}
+  .lb-podium .rank-num{
+    position:absolute;bottom:-6px;right:-2px;
+    width:20px;height:20px;border-radius:50%;
+    background:var(--gold);color:#fff;font-size:10px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid #fff;
+  }
+  .lb-podium .sc{font-size:11px;color:var(--ink-soft);font-weight:700;}
+
+  .lb-row{
+    display:flex;align-items:center;gap:12px;padding:11px 4px;
+    border-radius:10px;
+  }
+  .lb-row.self{background:var(--amber-bg);}
+  .lb-row .rank{width:22px;font-size:13px;font-weight:700;color:var(--ink-soft);text-align:center;}
+  .lb-row .avatar-sm{
+    width:34px;height:34px;border-radius:50%;background:#E6F1FB;
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#185FA5;
+  }
+  .lb-row .nm{flex:1;font-size:12.5px;font-weight:600;}
+  .lb-row .sc{font-size:12.5px;font-weight:700;}
+  .lb-update-note{font-size:10.5px;color:var(--ink-soft);text-align:center;margin-top:10px;}
+
+  .more-header{
+    background:linear-gradient(135deg,var(--red),var(--red-darker));
+    padding:20px 18px 22px;display:flex;align-items:center;gap:12px;
+  }
+  .more-header .avatar{width:54px;height:54px;font-size:18px;border:3px solid rgba(255,255,255,0.25);}
+  .more-header .name{color:#fff;font-size:15px;font-weight:700;}
+  .more-header .dept{color:rgba(255,255,255,0.85);font-size:11.5px;margin-top:2px;}
+  .more-stats{display:flex;gap:18px;padding:14px 18px;border-bottom:8px solid var(--gray-bg);}
+  .more-stats .item{text-align:center;flex:1;}
+  .more-stats .v{font-size:18px;font-weight:700;}
+  .more-stats .l{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
+
+  .more-item{
+    display:flex;align-items:center;gap:13px;
+    padding:14px 18px;border-bottom:1px solid var(--hair);
+    cursor:pointer;
+  }
+  .more-item .ic{font-size:18px;color:var(--ink-soft);width:20px;}
+  .more-item .lb{flex:1;font-size:13px;font-weight:500;}
+  .more-item.locked{opacity:.4;}
+  .more-item .chev{color:#C4C2B8;font-size:15px;}
+  .lock-tag{
+    font-size:9.5px;font-weight:700;background:var(--gray-bg);color:var(--gray-text);
+    padding:3px 8px;border-radius:6px;
+  }
+
+  .bottombar{
+    display:flex;align-items:flex-end;
+    border-top:1px solid var(--hair);
+    background:#fff;
+    padding:7px 6px 10px;
+    flex-shrink:0;
+    position:relative;
+    min-height:56px;
+  }
+  .bottombar .tab{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    cursor:pointer;background:none;border:none;font-family:inherit;
+    color:#9A988F;min-height:44px;padding:4px 2px;
+  }
+  .bottombar .tab .ic{font-size:19px;min-width:19px;min-height:19px;display:inline-block;line-height:1;}
+  .bottombar .tab .lb{font-size:9.5px;font-weight:600;}
+  .bottombar .tab.active{color:var(--red);}
+  .bottombar .tab.locked{color:#C4C2B8;}
+  .bottombar .tab-star{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    margin-top:-22px;cursor:pointer;min-height:44px;
+  }
+  .bottombar .tab-star .circle{
+    width:50px;height:50px;border-radius:50%;
+    background:linear-gradient(135deg,var(--red),var(--red-darker));
+    display:flex;align-items:center;justify-content:center;
+    border:4px solid #fff;
+    box-shadow:0 6px 14px rgba(200,30,30,.35);
+  }
+  .bottombar .tab-star .circle svg{color:var(--gold-light);font-size:22px;min-width:22px;min-height:22px;display:inline-block;line-height:1;}
+  .bottombar .tab-star .lb{font-size:9.5px;font-weight:600;color:#9A988F;margin-top:4px;}
+  .bottombar .tab-star.active .lb{color:var(--red);}
+
+  .toast{
+    position:absolute;bottom:90px;left:18px;right:18px;
+    background:var(--ink);color:#fff;
+    padding:12px 16px;border-radius:12px;font-size:12px;text-align:center;
+    z-index:50;opacity:0;pointer-events:none;
+    transition:opacity .25s, transform .25s;
+    transform:translateY(8px);
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  .legend{
+    display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+    max-width:375px;margin-top:18px;font-size:12px;color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend .dot{width:9px;height:9px;border-radius:50%;}
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<symbol id="icon-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></symbol>
+<symbol id="icon-calendar-event" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M8 15h2v2h-2z" /></symbol>
+<symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></symbol>
+<symbol id="icon-trophy" viewBox="0 0 24 24"><path d="M8 21l8 0" /><path d="M12 17l0 4" /><path d="M7 4l10 0l0 8a5 5 0 0 1 -10 0l0 -8z" /><path d="M17 6h2a1 1 0 0 1 1 1v1a3 3 0 0 1 -3 3" /><path d="M7 6h-2a1 1 0 0 0 -1 1v1a3 3 0 0 0 3 3" /></symbol>
+<symbol id="icon-menu-2" viewBox="0 0 24 24"><path d="M4 6l16 0" /><path d="M4 12l16 0" /><path d="M4 18l16 0" /></symbol>
+<symbol id="icon-gift" viewBox="0 0 24 24"><path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z" /><path d="M12 8l0 13" /><path d="M19 12l0 7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -7" /><path d="M7.5 8a2.5 2.5 0 0 1 0 -5c2 0 4.5 2.5 4.5 5" /><path d="M16.5 8a2.5 2.5 0 0 0 0 -5c-2 0 -4.5 2.5 -4.5 5" /></symbol>
+<symbol id="icon-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></symbol>
+<symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></symbol>
+<symbol id="icon-clock" viewBox="0 0 24 24"><path d="M12 7v5l3 3" /><path d="M12 21a9 9 0 1 0 0 -18a9 9 0 0 0 0 18z" /></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></symbol>
+<symbol id="icon-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" /></symbol>
+<symbol id="icon-chart-bar" viewBox="0 0 24 24"><path d="M3 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M9 5m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M17 9m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></symbol>
+<symbol id="icon-crown" viewBox="0 0 24 24"><path d="M3 6l3 3l5 -5l5 5l3 -3v11h-16v-11z" /><path d="M3 19h16" /></symbol>
+<symbol id="icon-info-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></symbol>
+<symbol id="icon-coin" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0 -18a9 9 0 0 0 0 18z" /><path d="M9 13a3 3 0 0 0 2 2.83" /><path d="M9 11a3 3 0 0 1 3 -3" /><path d="M12 8a3 3 0 0 1 3 3" /><path d="M12 19v-15" /></symbol>
+<symbol id="icon-id-badge-2" viewBox="0 0 24 24"><path d="M5 4m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v13a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /><path d="M10 13a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M8 21v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2" /><path d="M10 7l4 0" /></symbol>
+<symbol id="icon-award" viewBox="0 0 24 24"><path d="M12 9m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0" /><path d="M12 15l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.886" /><path d="M6.802 11.89l-3.4 5.888l3.598 -.233l1.598 3.232l3.4 -5.886" /></symbol>
+<symbol id="icon-message-heart" viewBox="0 0 24 24"><path d="M8 9h8" /><path d="M8 13h4.5" /><path d="M13.5 20.5l-5.5 -1.5h-1.5a3 3 0 0 1 -3 -3v-7a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v4" /><path d="M16.794 16.617c-.622 -.547 -1.265 -1.084 -1.794 -.617c-.62 .55 -.139 1.561 .544 2.262c.683 .703 2.378 1.738 2.456 1.738c.078 0 1.773 -1.035 2.456 -1.738c.683 -.701 1.164 -1.712 .544 -2.262c-.529 -.467 -1.172 .07 -1.794 .617" /></symbol>
+<symbol id="icon-settings" viewBox="0 0 24 24"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></symbol>
+<symbol id="icon-help" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 17l0 .01" /><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" /></symbol>
+<symbol id="icon-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" /></symbol>
+<symbol id="icon-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M21 12l-13 0" /><path d="M18 15l3 -3l-3 -3" /></symbol>
+<symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6" /></symbol>
+<symbol id="icon-wifi" viewBox="0 0 24 24"><path d="M12 18l.01 0" /><path d="M9.172 15.172a4 4 0 0 1 5.656 0" /><path d="M6.343 12.343a8 8 0 0 1 11.314 0" /><path d="M3.515 9.515c4.686 -4.687 12.284 -4.687 16.97 0" /></symbol>
+<symbol id="icon-battery" viewBox="0 0 24 24"><path d="M3 9m0 1a1 1 0 0 1 1 -1h11a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-11a1 1 0 0 1 -1 -1z" /><path d="M20 10l0 5" /><path d="M6 10l0 5" /><path d="M9 10l0 5" /><path d="M12 10l0 5" /></symbol>
+<symbol id="icon-antenna" viewBox="0 0 24 24"><path d="M6 18l0 -2" /><path d="M10 18l0 -5" /><path d="M14 18l0 -8" /><path d="M18 18l0 -11" /></symbol>
+</defs>
+</svg>
+
+
+<div class="page-title">WIN STAR — Demo giao diện <b>Giai đoạn 1</b> · bấm vào bottom tab bar để chuyển màn hình</div>
+
+<div class="device">
+  <div class="device-inner">
+
+    <!-- ============ LOGIN (đơn giản hóa: chỉ cần MSNV) ============ -->
+    <div class="screen" id="screen-login" style="display:block;">
+      <div class="red-hero" style="padding-bottom:30px;">
+        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
+        <div style="display:flex;align-items:center;gap:8px;padding-top:14px;">
+          <svg class="icon-svg" style="color:var(--gold-light);font-size:22px;"><use href="#icon-star" xlink:href="#icon-star"></use></svg>
+          <span style="color:#fff;font-size:19px;font-weight:700;">WIN STAR</span>
+        </div>
+      </div>
+      <div class="pad" style="padding-top:36px;">
+        <div style="text-align:center;margin-bottom:26px;">
+          <div style="font-size:16px;font-weight:700;">Đăng nhập</div>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:6px;">Nhập mã số nhân viên để vào hệ thống</div>
+        </div>
+        <label style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">MÃ SỐ NHÂN VIÊN (MSNV)</label>
+        <input id="login-msnv-input" type="text" placeholder="Ví dụ: NV04821" onkeydown="if(event.key==='Enter') loginWithMsnv();"
+          style="width:100%;margin-top:6px;padding:13px 14px;border-radius:12px;border:1px solid var(--hair);background:var(--gray-bg);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+        <button id="login-submit-btn" onclick="loginWithMsnv()"
+          style="width:100%;margin-top:16px;padding:13px;border:none;border-radius:12px;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">
+          Vào hệ thống
+        </button>
+        <div id="login-error" style="font-size:11.5px;color:#A32D2D;margin-top:10px;text-align:center;display:none;"></div>
+        <div style="font-size:10.5px;color:var(--ink-soft);margin-top:18px;text-align:center;line-height:1.5;">
+          Không cần mật khẩu — chỉ cần mã số nhân viên hợp lệ.<br>Dữ liệu hiển thị ở Giai đoạn 1 chỉ ở dạng xem.
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HOME ============ -->
+    <div class="screen" id="screen-home" style="display:none;">
+      <div class="red-hero">
+        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg class="icon-svg" style="color:var(--gold-light);font-size:22px;"><use href="#icon-star" xlink:href="#icon-star"></use></svg>
+            <span style="color:#fff;font-size:19px;font-weight:700;">WIN STAR</span>
+          </div>
+          <div style="position:relative;">
+            <svg class="icon-svg" style="color:#fff;font-size:20px;"><use href="#icon-bell" xlink:href="#icon-bell"></use></svg>
+            <span class="badge-count">3</span>
+          </div>
+        </div>
+        <div class="hero-tagline">
+          <div class="line1">Mỗi hành động</div>
+          <div class="line2">tích cực</div>
+          <div class="line3">Một ngôi sao tỏa sáng</div>
+        </div>
+      </div>
+
+      <div class="pad" style="padding-top:0;">
+        <div class="profile-card card card-shadow">
+          <div class="avatar" id="home-avatar-initials">NA</div>
+          <div style="flex:1;">
+            <div class="name" id="home-name">—</div>
+            <div class="dept" id="home-dept">—</div>
+          </div>
+          <div class="level-badge"><svg class="icon-svg" style="font-size:11px;"><use href="#icon-star" xlink:href="#icon-star"></use></svg>CBNV</div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-box">
+            <div class="label">Star balance</div>
+            <div class="value" id="home-star-balance">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Rank</div>
+            <div class="value" id="home-rank">—</div>
+          </div>
+        </div>
+
+        <div class="section-head"><span class="h">Lối tắt</span></div>
+        <div class="shortcut-grid">
+          <div class="shortcut" onclick="goTo('activity')">
+            <div class="ic" style="background:#FAECE7;color:#D85A30;"><svg class="icon-svg"><use href="#icon-calendar-event" xlink:href="#icon-calendar-event"></use></svg></div>
+            <div class="lb">Activity Center</div>
+          </div>
+          <div class="shortcut" onclick="goTo('wallet')">
+            <div class="ic" style="background:var(--amber-bg);color:var(--amber-text);"><svg class="icon-svg"><use href="#icon-coin" xlink:href="#icon-coin"></use></svg></div>
+            <div class="lb">STAR Wallet</div>
+          </div>
+          <div class="shortcut" onclick="goTo('leaderboard')">
+            <div class="ic" style="background:#E6F1FB;color:#185FA5;"><svg class="icon-svg"><use href="#icon-chart-bar" xlink:href="#icon-chart-bar"></use></svg></div>
+            <div class="lb">Leaderboard</div>
+          </div>
+          <div class="shortcut locked" onclick="showToast()">
+            <div class="ic" style="background:var(--gray-bg);color:var(--gray-text);"><svg class="icon-svg"><use href="#icon-gift" xlink:href="#icon-gift"></use></svg></div>
+            <div class="lb">Kudos</div>
+          </div>
+        </div>
+
+        <div class="section-head"><span class="h">Hoạt động nổi bật</span><span class="see-all" onclick="goTo('activity')">Xem tất cả</span></div>
+        <div id="home-featured-activity">
+          <div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:14px;">Đang tải...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ WALLET ============ -->
+    <div class="screen" id="screen-wallet" style="display:none;">
+      <div style="background:var(--red);">
+        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
+        <div class="topbar">
+          <div class="back-btn" onclick="goTo('home')"><svg class="icon-svg"><use href="#icon-arrow-left" xlink:href="#icon-arrow-left"></use></svg></div>
+          <div class="title">STAR Wallet</div>
+          <div class="icon-btn"><svg class="icon-svg"><use href="#icon-clock" xlink:href="#icon-clock"></use></svg></div>
+        </div>
+      </div>
+      <div class="pad">
+        <div class="wallet-hero-card">
+          <div class="lbl">SỐ SAO HIỆN TẠI</div>
+          <div class="amt"><span class="coin"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg></span><span id="wallet-balance">—</span></div>
+          <div class="wallet-sub-row">
+            <span id="wallet-tx-count">— giao dịch</span>
+          </div>
+        </div>
+
+        <div class="tab-pills">
+          <div class="tab-pill active">Lịch sử</div>
+          <div class="tab-pill" onclick="showToast()">Sử dụng</div>
+        </div>
+
+        <div id="wallet-history-list">
+          <div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:14px;">Đang tải...</div>
+        </div>
+
+        <div style="text-align:center;font-size:10.5px;color:var(--ink-soft);margin-top:14px;padding:10px;background:var(--gray-bg);border-radius:10px;">
+          Đổi sao lấy quà tại Marketplace sẽ mở ở Giai đoạn 2
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ACTIVITY ============ -->
+    <div class="screen" id="screen-activity" style="display:none;">
+      <div style="background:var(--red);">
+        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
+        <div class="topbar">
+          <div class="back-btn" onclick="goTo('home')"><svg class="icon-svg"><use href="#icon-arrow-left" xlink:href="#icon-arrow-left"></use></svg></div>
+          <div class="title">Activity Center</div>
+          <div class="icon-btn"><svg class="icon-svg"><use href="#icon-chart-bar" xlink:href="#icon-chart-bar"></use></svg></div>
+        </div>
+      </div>
+      <div class="pad">
+        <div class="search-bar"><svg class="icon-svg"><use href="#icon-search" xlink:href="#icon-search"></use></svg> Tìm kiếm hoạt động</div>
+        <div class="filter-row">
+          <div class="filter-chip active">Tất cả</div>
+          <div class="filter-chip">Sắp diễn ra</div>
+          <div class="filter-chip">Đã tham gia</div>
+          <div class="filter-chip">Đã kết thúc</div>
+        </div>
+        <div style="font-size:10.5px;color:var(--ink-soft);margin-bottom:12px;">
+          Nội dung do Admin đăng tải. Trạng thái tham gia được Admin cập nhật sau sự kiện — không có hành động nào dành cho bạn ở màn hình này.
+        </div>
+
+        <div id="activity-list">
+          <div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:14px;">Đang tải...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ LEADERBOARD ============ -->
+    <div class="screen" id="screen-leaderboard" style="display:none;">
+      <div style="background:var(--red);">
+        <div class="statusbar on-red"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
+        <div class="topbar">
+          <div class="back-btn" onclick="goTo('home')"><svg class="icon-svg"><use href="#icon-arrow-left" xlink:href="#icon-arrow-left"></use></svg></div>
+          <div class="title">Leaderboard</div>
+          <div class="icon-btn"><svg class="icon-svg"><use href="#icon-info-circle" xlink:href="#icon-info-circle"></use></svg></div>
+        </div>
+      </div>
+      <div class="pad">
+        <div class="filter-row">
+          <div class="filter-chip active">Cá nhân</div>
+          <div class="filter-chip" onclick="showToast('Xếp hạng theo phòng ban sẽ bổ sung sau, hiện chỉ có xếp hạng cá nhân.')">Phòng ban</div>
+          <div class="filter-chip" onclick="showToast('Xếp hạng theo khu vực sẽ bổ sung sau, hiện chỉ có xếp hạng cá nhân.')">Khu vực</div>
+        </div>
+        <div style="font-size:10px;color:var(--ink-soft);margin:-4px 0 8px;" id="leaderboard-updated-note">Đang tải dữ liệu...</div>
+
+        <div id="leaderboard-podium"></div>
+        <div id="leaderboard-list"></div>
+
+      </div>
+    </div>
+
+    <!-- ============ MORE ============ -->
+    <div class="screen" id="screen-more" style="display:none;">
+      <div class="more-header">
+        <div class="statusbar on-red" style="position:absolute;top:0;left:0;right:0;padding:10px 22px 0;"><span>9:41</span><span class="icons"><svg class="icon-svg"><use href="#icon-antenna" xlink:href="#icon-antenna"></use></svg><svg class="icon-svg"><use href="#icon-wifi" xlink:href="#icon-wifi"></use></svg><svg class="icon-svg"><use href="#icon-battery" xlink:href="#icon-battery"></use></svg></span></div>
+        <div class="avatar" style="margin-top:20px;" id="more-avatar-initials">NA</div>
+        <div style="margin-top:20px;">
+          <div class="name" id="more-name">—</div>
+          <div class="dept" id="more-dept">—</div>
+        </div>
+        <div class="level-badge" style="margin-left:auto;margin-top:20px;align-self:flex-start;"><svg class="icon-svg" style="font-size:11px;"><use href="#icon-star" xlink:href="#icon-star"></use></svg>CBNV</div>
+      </div>
+      <div class="more-stats">
+        <div class="item"><div class="v" id="more-star-balance">—</div><div class="l">STAR BALANCE</div></div>
+        <div class="item"><div class="v" id="more-rank">—</div><div class="l">RANK</div></div>
+      </div>
+
+      <div class="more-item"><svg class="icon-svg ic"><use href="#icon-id-badge-2" xlink:href="#icon-id-badge-2"></use></svg><span class="lb">Hồ sơ cá nhân</span><svg class="icon-svg chev"><use href="#icon-chevron-right" xlink:href="#icon-chevron-right"></use></svg></div>
+      <div class="more-item locked" onclick="showToast()"><svg class="icon-svg ic"><use href="#icon-award" xlink:href="#icon-award"></use></svg><span class="lb">Badge collection</span><span class="lock-tag">Giai đoạn 2</span></div>
+      <div class="more-item locked" onclick="showToast()"><svg class="icon-svg ic"><use href="#icon-message-heart" xlink:href="#icon-message-heart"></use></svg><span class="lb">Recognition &amp; Kudos</span><span class="lock-tag">Giai đoạn 2</span></div>
+      <div class="more-item locked" onclick="showToast()"><svg class="icon-svg ic"><use href="#icon-gift" xlink:href="#icon-gift"></use></svg><span class="lb">Reward Marketplace</span><span class="lock-tag">Giai đoạn 2</span></div>
+      <div class="more-item"><svg class="icon-svg ic"><use href="#icon-settings" xlink:href="#icon-settings"></use></svg><span class="lb">Cài đặt</span><svg class="icon-svg chev"><use href="#icon-chevron-right" xlink:href="#icon-chevron-right"></use></svg></div>
+      <div class="more-item"><svg class="icon-svg ic"><use href="#icon-bell" xlink:href="#icon-bell"></use></svg><span class="lb">Thông báo</span><svg class="icon-svg chev"><use href="#icon-chevron-right" xlink:href="#icon-chevron-right"></use></svg></div>
+      <div class="more-item"><svg class="icon-svg ic"><use href="#icon-help" xlink:href="#icon-help"></use></svg><span class="lb">Câu hỏi thường gặp</span><svg class="icon-svg chev"><use href="#icon-chevron-right" xlink:href="#icon-chevron-right"></use></svg></div>
+      <div class="more-item"><svg class="icon-svg ic"><use href="#icon-phone" xlink:href="#icon-phone"></use></svg><span class="lb">Liên hệ hỗ trợ</span><svg class="icon-svg chev"><use href="#icon-chevron-right" xlink:href="#icon-chevron-right"></use></svg></div>
+      <div class="more-item" onclick="goTo('login')"><svg class="icon-svg ic"><use href="#icon-logout" xlink:href="#icon-logout"></use></svg><span class="lb">Đăng xuất</span></div>
+    </div>
+
+    <!-- ============ BOTTOM TAB BAR ============ -->
+    <div class="bottombar">
+      <button class="tab active" id="tab-home" onclick="goTo('home')"><svg class="icon-svg ic"><use href="#icon-home" xlink:href="#icon-home"></use></svg><span class="lb">Trang chủ</span></button>
+      <button class="tab" id="tab-activity" onclick="goTo('activity')"><svg class="icon-svg ic"><use href="#icon-calendar-event" xlink:href="#icon-calendar-event"></use></svg><span class="lb">Activity</span></button>
+      <div class="tab-star" id="tab-wallet" onclick="goTo('wallet')"><span class="circle"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg></span><span class="lb">Sao</span></div>
+      <button class="tab" id="tab-leaderboard" onclick="goTo('leaderboard')"><svg class="icon-svg ic"><use href="#icon-trophy" xlink:href="#icon-trophy"></use></svg><span class="lb">Xếp hạng</span></button>
+      <button class="tab" id="tab-more" onclick="goTo('more')"><svg class="icon-svg ic"><use href="#icon-menu-2" xlink:href="#icon-menu-2"></use></svg><span class="lb">More</span></button>
+    </div>
+
+    <div class="toast" id="toast">Tính năng này thuộc Giai đoạn 2, chưa mở trong bản hiện tại.</div>
+  </div>
+</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:var(--green-text);"></span>Đã tham gia (đã cộng sao)</span>
+  <span><span class="dot" style="background:var(--gray-text);"></span>Sắp diễn ra / không tham gia</span>
+  <span><span class="dot" style="background:var(--amber-text);"></span>Khóa — thuộc Giai đoạn 2</span>
+</div>
+
+<script>
+  // ============ CẤU HÌNH KẾT NỐI BACKEND THẬT ============
+  const API_URL = 'https://script.google.com/macros/s/AKfycbw2eAglBbxjMzm4-Iqym540ODLmhc3EE6ribtRUiosfDsuvWA39tCTM9y-wUXy1ENXnRg/exec';
+  let sessionToken = null;
+
+  /**
+   * Gọi Apps Script Web App. Dùng Content-Type: text/plain để trình duyệt coi đây là
+   * "simple request" và KHÔNG gửi preflight OPTIONS — Apps Script Web App không tự xử lý
+   * preflight được, nên đây là cách né lỗi CORS chuẩn cho kiến trúc này.
+   * Apps Script vẫn parse được JSON.parse(e.postData.contents) như bình thường ở phía server.
+   */
+  async function callApi(action, body) {
+    const payload = Object.assign({ action }, body || {});
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch (err) {
+      console.error('Lỗi gọi API:', err);
+      return { ok: false, error: { code: 'NETWORK_ERROR', message: 'Không kết nối được tới hệ thống. Vui lòng kiểm tra mạng và thử lại.' } };
+    }
+  }
+
+  // ============ ĐIỀU HƯỚNG ============
+  const screens = ['login','home','wallet','activity','leaderboard','more'];
+  function goTo(name){
+    screens.forEach(s => {
+      document.getElementById('screen-' + s).style.display = (s === name) ? 'block' : 'none';
+    });
+    document.querySelector('.bottombar').style.display = (name === 'login') ? 'none' : 'flex';
+    document.querySelectorAll('.bottombar .tab, .bottombar .tab-star').forEach(el => el.classList.remove('active'));
+    if(name === 'home') document.getElementById('tab-home').classList.add('active');
+    if(name === 'activity') document.getElementById('tab-activity').classList.add('active');
+    if(name === 'wallet') document.getElementById('tab-wallet').classList.add('active');
+    if(name === 'more') document.getElementById('tab-more').classList.add('active');
+    if(name === 'leaderboard') document.getElementById('tab-leaderboard').classList.add('active');
+    document.getElementById('screen-' + name).scrollTop = 0;
+
+    if(name === 'home') loadHome();
+    if(name === 'wallet') loadWallet();
+    if(name === 'activity') loadActivities();
+    if(name === 'leaderboard') loadLeaderboard();
+    if(name === 'more') loadMore();
+  }
+
+  // ============ ĐĂNG NHẬP THẬT ============
+  async function loginWithMsnv(){
+    const input = document.getElementById('login-msnv-input');
+    const errBox = document.getElementById('login-error');
+    const btn = document.getElementById('login-submit-btn');
+    const msnv = input.value.trim();
+    if(!msnv){
+      errBox.textContent = 'Vui lòng nhập mã số nhân viên.';
+      errBox.style.display = 'block';
+      return;
+    }
+    errBox.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Đang kiểm tra...';
+
+    const result = await callApi('login', { msnv });
+
+    btn.disabled = false;
+    btn.textContent = 'Vào hệ thống';
+
+    if (!result.ok) {
+      errBox.textContent = result.error && result.error.message ? result.error.message : 'Đăng nhập không thành công.';
+      errBox.style.display = 'block';
+      return;
+    }
+    sessionToken = result.data.sessionToken;
+    goTo('home');
+  }
+
+  function initials(name){
+    if (!name) return '--';
+    const parts = String(name).trim().split(/\s+/);
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function formatDateVN(dateStr){
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return d.toLocaleDateString('vi-VN');
+  }
+
+  // ============ HOME ============
+  async function loadHome(){
+    const result = await callApi('getProfile', { sessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const p = result.data;
+    document.getElementById('home-avatar-initials').textContent = initials(p.hoTen);
+    document.getElementById('home-name').textContent = p.hoTen || '—';
+    document.getElementById('home-dept').textContent = p.phongBan || '—';
+    document.getElementById('home-star-balance').textContent = Number(p.tongSao || 0).toLocaleString('vi-VN');
+    document.getElementById('home-rank').textContent = p.xepHang ? ('#' + p.xepHang) : '—';
+
+    const actResult = await callApi('getActivities', { sessionToken });
+    const box = document.getElementById('home-featured-activity');
+    if (actResult.ok && actResult.data.danhSach.length > 0) {
+      const upcoming = actResult.data.danhSach.find(a => a.trangThai === 'SAP_DIEN_RA') || actResult.data.danhSach[0];
+      box.innerHTML =
+        '<div class="activity-feature">' +
+        '<div class="thumb" style="background:linear-gradient(135deg,#c9a87a,#8a6f4e);display:flex;align-items:center;justify-content:center;"><svg class="icon-svg" style="color:rgba(255,255,255,.85);font-size:26px;"><use href="#icon-calendar-event" xlink:href="#icon-calendar-event"></use></svg></div>' +
+        '<div class="body">' +
+        '<span class="tag">EVENT</span>' +
+        '<div class="name">' + escapeHtml(upcoming.tenHoatDong) + '</div>' +
+        '<div class="meta">' + formatDateVN(upcoming.ngayBatDau) + ' – ' + formatDateVN(upcoming.ngayKetThuc) + ' · ' + escapeHtml(upcoming.diaDiem || '') + '</div>' +
+        '<div class="note">Thông tin do Admin đăng tải — chỉ xem</div>' +
+        '</div></div>';
+    } else {
+      box.innerHTML = '<div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:14px;">Chưa có hoạt động nào.</div>';
+    }
+  }
+
+  // ============ WALLET ============
+  async function loadWallet(){
+    const result = await callApi('getWalletHistory', { sessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const d = result.data;
+    document.getElementById('wallet-balance').textContent = Number(d.tongSaoHienTai || 0).toLocaleString('vi-VN');
+    document.getElementById('wallet-tx-count').textContent = (d.lichSu || []).length + ' giao dịch';
+
+    const listEl = document.getElementById('wallet-history-list');
+    if (!d.lichSu || d.lichSu.length === 0) {
+      listEl.innerHTML = '<div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:14px;">Chưa có giao dịch nào.</div>';
+      return;
+    }
+    listEl.innerHTML = d.lichSu.map(tx => (
+      '<div class="history-item">' +
+      '<div class="ic-circle" style="background:var(--green-bg);color:var(--green-text);"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg></div>' +
+      '<div class="info"><div class="t">' + escapeHtml(tx.maThamChieu || tx.loaiGiaoDich) + '</div><div class="d">' + formatDateVN(tx.thoiDiem) + '</div></div>' +
+      '<div class="delta pos">+' + Number(tx.soSao || 0).toLocaleString('vi-VN') + '</div>' +
+      '</div>'
+    )).join('');
+  }
+
+  // ============ ACTIVITY ============
+  const STATUS_LABEL = {
+    'SAP_DIEN_RA': { cls: 'upcoming', text: 'Sắp diễn ra' },
+    'DA_THAM_GIA': { cls: 'confirmed', text: null }, // text gắn kèm số sao khi render
+    'KHONG_THAM_GIA': { cls: 'none', text: 'Không tham gia' }
+  };
+
+  async function loadActivities(){
+    const result = await callApi('getActivities', { sessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const listEl = document.getElementById('activity-list');
+    const list = result.data.danhSach || [];
+    if (list.length === 0) {
+      listEl.innerHTML = '<div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:14px;">Chưa có hoạt động nào.</div>';
+      return;
+    }
+    listEl.innerHTML = list.map(a => {
+      const st = STATUS_LABEL[a.trangThai] || STATUS_LABEL['KHONG_THAM_GIA'];
+      const pillText = a.trangThai === 'DA_THAM_GIA'
+        ? '<svg class="icon-svg"><use href="#icon-check" xlink:href="#icon-check"></use></svg>Đã tham gia +' + a.soSaoQuyDinh
+        : st.text;
+      return (
+        '<div class="activity-card">' +
+        '<div class="thumb" style="background:linear-gradient(135deg,#c9a87a,#8a6f4e);display:flex;align-items:center;justify-content:center;"><svg class="icon-svg" style="color:rgba(255,255,255,.85);font-size:26px;"><use href="#icon-calendar-event" xlink:href="#icon-calendar-event"></use></svg></div>' +
+        '<div class="body">' +
+        '<span class="star-chip"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg>' + a.soSaoQuyDinh + '</span>' +
+        '<div class="name">' + escapeHtml(a.tenHoatDong) + '</div>' +
+        '<div class="meta">' + formatDateVN(a.ngayBatDau) + ' – ' + formatDateVN(a.ngayKetThuc) + ' · ' + escapeHtml(a.diaDiem || '') + '</div>' +
+        '<div class="status-row"><span class="status-pill ' + st.cls + '">' + pillText + '</span></div>' +
+        '</div></div>'
+      );
+    }).join('');
+  }
+
+  // ============ LEADERBOARD ============
+  async function loadLeaderboard(){
+    const result = await callApi('getLeaderboard', { sessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const list = (result.data.danhSach || []).slice().sort((a, b) => Number(a.xepHang) - Number(b.xepHang));
+    document.getElementById('leaderboard-updated-note').textContent = result.data.capNhatLuc
+      ? ('Cập nhật lúc ' + formatDateVN(result.data.capNhatLuc) + ' — dữ liệu tổng hợp định kỳ')
+      : 'Dữ liệu tổng hợp định kỳ';
+
+    const top3 = list.slice(0, 3);
+    const rest = list.slice(3);
+    const podiumEl = document.getElementById('leaderboard-podium');
+    const order = [top3[1], top3[0], top3[2]].filter(Boolean); // 2-1-3 đúng layout bục podium
+    if (top3.length > 0) {
+      podiumEl.innerHTML = '<div class="lb-podium">' + order.map(p => {
+        if (!p) return '';
+        const isGold = Number(p.xepHang) === 1;
+        const crown = isGold ? '<span class="crown"><svg class="icon-svg" style="color:var(--gold);"><use href="#icon-crown" xlink:href="#icon-crown"></use></svg></span>' : '';
+        const rankBg = isGold ? 'var(--gold)' : (Number(p.xepHang) === 3 ? '#BA7517' : '');
+        return (
+          '<div class="slot' + (isGold ? ' gold' : '') + '">' + crown +
+          '<div class="pic">' + initials(p.hoTen) + '<span class="rank-num"' + (rankBg ? ' style="background:' + rankBg + ';"' : '') + '>' + p.xepHang + '</span></div>' +
+          '<div class="nm">' + escapeHtml(p.hoTen) + '</div>' +
+          '<div class="sc">' + Number(p.tongSao).toLocaleString('vi-VN') + '</div></div>'
+        );
+      }).join('') + '</div>';
+    } else {
+      podiumEl.innerHTML = '';
+    }
+
+    const listEl = document.getElementById('leaderboard-list');
+    listEl.innerHTML = rest.map(p => (
+      '<div class="lb-row">' +
+      '<div class="rank">' + p.xepHang + '</div>' +
+      '<div class="avatar-sm">' + initials(p.hoTen) + '</div>' +
+      '<div class="nm">' + escapeHtml(p.hoTen) + '</div>' +
+      '<div class="sc">' + Number(p.tongSao).toLocaleString('vi-VN') + '</div></div>'
+    )).join('');
+  }
+
+  // ============ MORE ============
+  async function loadMore(){
+    const result = await callApi('getProfile', { sessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const p = result.data;
+    document.getElementById('more-avatar-initials').textContent = initials(p.hoTen);
+    document.getElementById('more-name').textContent = p.hoTen || '—';
+    document.getElementById('more-dept').textContent = p.phongBan || '—';
+    document.getElementById('more-star-balance').textContent = Number(p.tongSao || 0).toLocaleString('vi-VN');
+    document.getElementById('more-rank').textContent = p.xepHang ? ('#' + p.xepHang) : '—';
+  }
+
+  function handleAuthError(result){
+    if (result.error && result.error.code === 'UNAUTHORIZED') {
+      sessionToken = null;
+      goTo('login');
+      const errBox = document.getElementById('login-error');
+      errBox.textContent = 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.';
+      errBox.style.display = 'block';
+    } else {
+      showToast(result.error && result.error.message ? result.error.message : 'Có lỗi xảy ra, vui lòng thử lại.');
+    }
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = String(str || '');
+    return div.innerHTML;
+  }
+
+  // Đồng bộ trạng thái ban đầu khi tải trang (ẩn bottombar ở màn login).
+  goTo('login');
+
+  function showToast(message){
+    const t = document.getElementById('toast');
+    if (message) t.textContent = message;
+    t.classList.add('show');
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+</script>
+
+</body>
+</html>

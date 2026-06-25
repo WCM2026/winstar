@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WIN STAR — Trang quản trị Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --red:#C81E1E; --red-dark:#A11717; --red-darker:#7A1212;
+    --gold:#F5A623; --gold-light:#FFD166;
+    --green:#1D9E75; --green-bg:#EAF3DE; --green-text:#27500A;
+    --amber-bg:#FAEEDA; --amber-text:#854F0B;
+    --gray-bg:#F1EFE8; --gray-text:#5F5E5A;
+    --ink:#2C2C2A; --ink-soft:#6B6A66; --hair:#E7E4DC; --white:#FFFFFF;
+    --danger-bg:#FCEBEB; --danger-text:#A32D2D;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  .icon-svg{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-0.125em;}
+  body{font-family:'Inter',-apple-system,sans-serif;background:#EDEAE2;color:var(--ink);min-height:100vh;}
+
+  .topbar{
+    background:linear-gradient(135deg,var(--red),var(--red-darker));
+    color:#fff;padding:14px 28px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 2px 12px rgba(0,0,0,.12);position:sticky;top:0;z-index:10;
+  }
+  .topbar .brand{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:700;}
+  .topbar .brand .icon-svg{font-size:22px;color:var(--gold-light);}
+  .topbar .tag{font-size:12px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:8px;font-weight:600;}
+  .topbar .spacer{flex:1;}
+  .topbar .who{font-size:13px;opacity:.92;}
+  .topbar .logout-btn{
+    background:rgba(255,255,255,.15);border:none;color:#fff;padding:8px 14px;border-radius:8px;
+    font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;
+  }
+  .topbar .logout-btn:hover{background:rgba(255,255,255,.25);}
+
+  .layout{display:flex;min-height:calc(100vh - 60px);}
+  .sidebar{
+    width:220px;background:#fff;border-right:1px solid var(--hair);
+    padding:18px 12px;flex-shrink:0;
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;
+    font-size:14px;font-weight:600;color:var(--ink-soft);cursor:pointer;margin-bottom:4px;
+  }
+  .nav-item .icon-svg{font-size:18px;}
+  .nav-item:hover{background:var(--gray-bg);}
+  .nav-item.active{background:var(--danger-bg);color:var(--red);}
+
+  .main{flex:1;padding:28px 32px;max-width:1100px;}
+  .page-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+  .page-sub{font-size:13px;color:var(--ink-soft);margin-bottom:24px;}
+
+  .card{background:#fff;border:1px solid var(--hair);border-radius:16px;padding:20px;}
+  .card + .card{margin-top:18px;}
+
+  .stat-grid{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+  .stat-card{background:#fff;border:1px solid var(--hair);border-radius:14px;padding:18px;flex:1;min-width:200px;}
+  .stat-card .label{font-size:12px;color:var(--ink-soft);font-weight:600;}
+  .stat-card .value{font-size:28px;font-weight:700;margin-top:6px;}
+  .stat-card .icon-wrap{
+    width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+    margin-bottom:10px;font-size:18px;
+  }
+
+  .form-row{margin-bottom:16px;}
+  .form-row label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
+  .form-row input, .form-row select{
+    width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--hair);
+    background:var(--gray-bg);font-size:14px;font-family:inherit;outline:none;
+  }
+  .form-row input:focus, .form-row select:focus{border-color:var(--red);background:#fff;}
+  .form-grid-2{display:flex;gap:16px;}
+  .form-grid-2 .form-row{flex:1;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border:none;border-radius:10px;
+    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-primary{background:var(--red);color:#fff;}
+  .btn-primary:hover{background:var(--red-dark);}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-secondary{background:var(--gray-bg);color:var(--ink);}
+  .btn-secondary:hover{background:#E4E1D8;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;padding:10px 12px;color:var(--ink-soft);font-weight:600;border-bottom:2px solid var(--hair);font-size:12px;text-transform:uppercase;letter-spacing:.02em;}
+  td{padding:11px 12px;border-bottom:1px solid var(--hair);}
+  tr:hover td{background:#FAFAF8;}
+
+  .pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:7px;}
+  .pill.upcoming{background:var(--amber-bg);color:var(--amber-text);}
+  .pill.ongoing{background:#E6F1FB;color:#185FA5;}
+  .pill.ended{background:var(--gray-bg);color:var(--gray-text);}
+
+  .upload-zone{
+    border:2px dashed var(--hair);border-radius:14px;padding:32px;text-align:center;
+    cursor:pointer;background:var(--gray-bg);transition:border-color .15s;
+  }
+  .upload-zone:hover, .upload-zone.dragover{border-color:var(--red);background:#FAECE7;}
+  .upload-zone .icon-svg{font-size:36px;color:var(--ink-soft);margin-bottom:10px;}
+  .upload-zone .main-text{font-size:14px;font-weight:600;}
+  .upload-zone .sub-text{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+  .result-box{border-radius:12px;padding:16px;margin-top:16px;font-size:13.5px;}
+  .result-box.success{background:var(--green-bg);color:var(--green-text);}
+  .result-box.warning{background:var(--amber-bg);color:var(--amber-text);}
+  .result-box .row{display:flex;justify-content:space-between;padding:4px 0;}
+  .result-box ul{margin:6px 0 0 18px;}
+
+  .error-msg{font-size:12.5px;color:var(--danger-text);margin-top:8px;display:none;}
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:13px 18px;
+    border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+    transform:translateY(8px);z-index:100;max-width:340px;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  /* Màn đăng nhập */
+  .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;}
+  .login-card{
+    width:380px;background:#fff;border-radius:20px;padding:36px 32px;
+    box-shadow:0 20px 50px rgba(0,0,0,.12);
+  }
+  .login-card .brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;}
+  .login-card .brand .icon-svg{font-size:26px;color:var(--gold);}
+  .login-card .brand .name{font-size:20px;font-weight:700;color:var(--red);}
+  .login-card .sub{text-align:center;font-size:13px;color:var(--ink-soft);margin-bottom:26px;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<symbol id="icon-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></symbol>
+<symbol id="icon-calendar-event" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M8 15h2v2h-2z" /></symbol>
+<symbol id="icon-star" viewBox="0 0 24 24"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></symbol>
+<symbol id="icon-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M21 12l-13 0" /><path d="M18 15l3 -3l-3 -3" /></symbol>
+<symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></symbol>
+<symbol id="icon-upload" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 9l5 -5l5 5" /><path d="M12 4l0 12" /></symbol>
+<symbol id="icon-download" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></symbol>
+<symbol id="icon-users" viewBox="0 0 24 24"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" /></symbol>
+<symbol id="icon-alert-circle" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 8l0 4" /><path d="M12 16l.01 0" /></symbol>
+<symbol id="icon-circle-check" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M9 12l2 2l4 -4" /></symbol>
+<symbol id="icon-file-spreadsheet" viewBox="0 0 24 24"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M8 11h8v7h-8z" /><path d="M8 15h8" /><path d="M11 11v7" /></symbol>
+<symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></symbol>
+<symbol id="icon-layout-dashboard" viewBox="0 0 24 24"><path d="M4 4m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z" /><path d="M4 16m0 1a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1z" /><path d="M14 7m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></symbol>
+</defs>
+</svg>
+
+<!-- ============ MÀN ĐĂNG NHẬP ============ -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-card">
+    <div class="brand"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg><span class="name">WIN STAR</span></div>
+    <div class="sub">Trang quản trị — chỉ dành cho Admin / BTC</div>
+
+    <div class="form-row">
+      <label>Tên đăng nhập</label>
+      <input id="admin-username" type="text" placeholder="VD: admin1" onkeydown="if(event.key==='Enter') document.getElementById('admin-password').focus();">
+    </div>
+    <div class="form-row">
+      <label>Mật khẩu</label>
+      <input id="admin-password" type="password" placeholder="Nhập mật khẩu" onkeydown="if(event.key==='Enter') adminLogin();">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" id="admin-login-btn" onclick="adminLogin()">Đăng nhập</button>
+    <div class="error-msg" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ============ ỨNG DỤNG ADMIN ============ -->
+<div class="hidden" id="app-screen">
+  <div class="topbar">
+    <div class="brand"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg>WIN STAR</div>
+    <div class="tag">Trang quản trị</div>
+    <div class="spacer"></div>
+    <div class="who" id="admin-who-label">—</div>
+    <button class="logout-btn" onclick="adminLogout()"><svg class="icon-svg"><use href="#icon-logout" xlink:href="#icon-logout"></use></svg>Đăng xuất</button>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="nav-item active" id="nav-overview" onclick="showPage('overview')"><svg class="icon-svg"><use href="#icon-layout-dashboard" xlink:href="#icon-layout-dashboard"></use></svg>Tổng quan</div>
+      <div class="nav-item" id="nav-create" onclick="showPage('create')"><svg class="icon-svg"><use href="#icon-plus" xlink:href="#icon-plus"></use></svg>Tạo hoạt động</div>
+      <div class="nav-item" id="nav-confirm" onclick="showPage('confirm')"><svg class="icon-svg"><use href="#icon-upload" xlink:href="#icon-upload"></use></svg>Xác nhận tham dự</div>
+    </div>
+
+    <div class="main">
+      <!-- TRANG TỔNG QUAN -->
+      <div id="page-overview">
+        <div class="page-title">Tổng quan hệ thống</div>
+        <div class="page-sub">Số liệu cập nhật trực tiếp từ dữ liệu hiện có.</div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="icon-wrap" style="background:#E6F1FB;color:#185FA5;"><svg class="icon-svg"><use href="#icon-users" xlink:href="#icon-users"></use></svg></div>
+            <div class="label">Tổng CBNV</div>
+            <div class="value" id="ov-employees">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon-wrap" style="background:var(--amber-bg);color:var(--amber-text);"><svg class="icon-svg"><use href="#icon-calendar-event" xlink:href="#icon-calendar-event"></use></svg></div>
+            <div class="label">Tổng hoạt động</div>
+            <div class="value" id="ov-activities">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon-wrap" style="background:#FAECE7;color:#D85A30;"><svg class="icon-svg"><use href="#icon-star" xlink:href="#icon-star"></use></svg></div>
+            <div class="label">Tổng sao đã cộng</div>
+            <div class="value" id="ov-stars">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon-wrap" style="background:var(--green-bg);color:var(--green-text);"><svg class="icon-svg"><use href="#icon-circle-check" xlink:href="#icon-circle-check"></use></svg></div>
+            <div class="label">Lượt xác nhận tham dự</div>
+            <div class="value" id="ov-confirmations">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <span style="font-size:15px;font-weight:700;">Danh sách hoạt động</span>
+            <button class="btn btn-secondary" onclick="loadOverview();loadActivitiesTable();">Tải lại</button>
+          </div>
+          <table>
+            <thead><tr><th>Mã HĐ</th><th>Tên hoạt động</th><th>Thời gian</th><th>Địa điểm</th><th>Số sao</th><th>Trạng thái</th></tr></thead>
+            <tbody id="overview-activity-table"><tr><td colspan="6" style="color:var(--ink-soft);text-align:center;padding:24px;">Đang tải...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRANG TẠO HOẠT ĐỘNG -->
+      <div id="page-create" class="hidden">
+        <div class="page-title">Tạo hoạt động mới</div>
+        <div class="page-sub">Hoạt động sau khi tạo sẽ hiển thị ngay cho CBNV ở Activity Center (trạng thái "Sắp diễn ra" hoặc "Đang diễn ra").</div>
+
+        <div class="card">
+          <div class="form-row">
+            <label>Tên hoạt động</label>
+            <input id="create-name" type="text" placeholder="VD: Hội thao công ty 2026">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Ngày bắt đầu</label>
+              <input id="create-start" type="date">
+            </div>
+            <div class="form-row">
+              <label>Ngày kết thúc</label>
+              <input id="create-end" type="date">
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-row">
+              <label>Địa điểm</label>
+              <input id="create-location" type="text" placeholder="VD: Hội trường A, hoặc Online">
+            </div>
+            <div class="form-row">
+              <label>Số sao mỗi người tham dự</label>
+              <input id="create-stars" type="number" min="1" placeholder="VD: 200">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="create-submit-btn" onclick="submitCreateActivity()"><svg class="icon-svg"><use href="#icon-plus" xlink:href="#icon-plus"></use></svg>Tạo hoạt động</button>
+          <div id="create-result"></div>
+        </div>
+      </div>
+
+      <!-- TRANG XÁC NHẬN THAM DỰ -->
+      <div id="page-confirm" class="hidden">
+        <div class="page-title">Xác nhận danh sách tham dự</div>
+        <div class="page-sub">Tải file mẫu, điền danh sách MSNV đã tham dự thực tế, rồi tải lên — hệ thống tự động cộng sao.</div>
+
+        <div class="card">
+          <div class="form-row">
+            <label>Chọn hoạt động</label>
+            <select id="confirm-activity-select"><option value="">— Đang tải danh sách —</option></select>
+          </div>
+
+          <div style="margin:18px 0;">
+            <a href="Template_XacNhanThamDu.xlsx" download class="btn btn-secondary" style="text-decoration:none;">
+              <svg class="icon-svg"><use href="#icon-download" xlink:href="#icon-download"></use></svg>Tải file mẫu Excel
+            </a>
+          </div>
+
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click();">
+            <svg class="icon-svg"><use href="#icon-file-spreadsheet" xlink:href="#icon-file-spreadsheet"></use></svg>
+            <div class="main-text" id="upload-zone-text">Bấm để chọn file Excel, hoặc kéo thả vào đây</div>
+            <div class="sub-text">Chấp nhận .xlsx, .xls — cột MSNV là bắt buộc</div>
+          </div>
+          <input type="file" id="file-input" accept=".xlsx,.xls" class="hidden" onchange="handleFileSelected(event)">
+
+          <div id="parsed-preview" class="hidden" style="margin-top:16px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Đã đọc được <span id="parsed-count">0</span> MSNV từ file:</div>
+            <div style="max-height:140px;overflow-y:auto;background:var(--gray-bg);border-radius:10px;padding:10px 14px;font-size:12.5px;font-family:monospace;" id="parsed-list"></div>
+            <div style="margin-top:14px;display:flex;gap:10px;">
+              <button class="btn btn-primary" id="confirm-submit-btn" onclick="submitConfirmAttendance()"><svg class="icon-svg"><use href="#icon-upload" xlink:href="#icon-upload"></use></svg>Xác nhận và cộng sao</button>
+              <button class="btn btn-secondary" onclick="resetUpload()"><svg class="icon-svg"><use href="#icon-x" xlink:href="#icon-x"></use></svg>Chọn file khác</button>
+            </div>
+          </div>
+
+          <div id="confirm-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbw2eAglBbxjMzm4-Iqym540ODLmhc3EE6ribtRUiosfDsuvWA39tCTM9y-wUXy1ENXnRg/exec';
+  let adminSessionToken = null;
+  let parsedMsnvList = [];
+
+  async function callApi(action, body) {
+    const payload = Object.assign({ action }, body || {});
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const text = await res.text();
+      return JSON.parse(text);
+    } catch (err) {
+      console.error('Lỗi gọi API:', err);
+      return { ok: false, error: { code: 'NETWORK_ERROR', message: 'Không kết nối được tới hệ thống. Vui lòng kiểm tra mạng và thử lại.' } };
+    }
+  }
+
+  function showToast(message) {
+    const t = document.getElementById('toast');
+    t.textContent = message;
+    t.classList.add('show');
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str || '');
+    return div.innerHTML;
+  }
+
+  function formatDateVN(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return String(dateStr);
+    return d.toLocaleDateString('vi-VN');
+  }
+
+  // ============ ĐĂNG NHẬP ============
+  async function adminLogin() {
+    const username = document.getElementById('admin-username').value.trim();
+    const password = document.getElementById('admin-password').value;
+    const errBox = document.getElementById('login-error');
+    const btn = document.getElementById('admin-login-btn');
+
+    if (!username || !password) {
+      errBox.textContent = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.';
+      errBox.style.display = 'block';
+      return;
+    }
+    errBox.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Đang kiểm tra...';
+
+    const result = await callApi('adminLogin', { username, password });
+
+    btn.disabled = false;
+    btn.textContent = 'Đăng nhập';
+
+    if (!result.ok) {
+      errBox.textContent = result.error && result.error.message ? result.error.message : 'Đăng nhập không thành công.';
+      errBox.style.display = 'block';
+      return;
+    }
+    adminSessionToken = result.data.adminSessionToken;
+    document.getElementById('admin-who-label').textContent = result.data.hoTen || username;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-screen').classList.remove('hidden');
+    showPage('overview');
+  }
+
+  function adminLogout() {
+    adminSessionToken = null;
+    document.getElementById('app-screen').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('admin-username').value = '';
+    document.getElementById('admin-password').value = '';
+  }
+
+  function handleAuthError(result) {
+    if (result.error && result.error.code === 'UNAUTHORIZED') {
+      showToast('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
+      adminLogout();
+    } else {
+      showToast(result.error && result.error.message ? result.error.message : 'Có lỗi xảy ra, vui lòng thử lại.');
+    }
+  }
+
+  // ============ ĐIỀU HƯỚNG ============
+  function showPage(name) {
+    ['overview', 'create', 'confirm'].forEach(p => {
+      document.getElementById('page-' + p).classList.toggle('hidden', p !== name);
+      document.getElementById('nav-' + p).classList.toggle('active', p === name);
+    });
+    if (name === 'overview') { loadOverview(); loadActivitiesTable(); }
+    if (name === 'confirm') loadActivitiesForSelect();
+  }
+
+  // ============ TỔNG QUAN ============
+  async function loadOverview() {
+    const result = await callApi('adminGetOverview', { adminSessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const d = result.data;
+    document.getElementById('ov-employees').textContent = d.tongSoNhanVien.toLocaleString('vi-VN');
+    document.getElementById('ov-activities').textContent = d.tongSoHoatDong.toLocaleString('vi-VN');
+    document.getElementById('ov-stars').textContent = d.tongSaoDaCong.toLocaleString('vi-VN');
+    document.getElementById('ov-confirmations').textContent = d.soLuotXacNhan.toLocaleString('vi-VN');
+  }
+
+  const STATUS_PILL = {
+    'SAP_DIEN_RA': { cls: 'upcoming', text: 'Sắp diễn ra' },
+    'DANG_DIEN_RA': { cls: 'ongoing', text: 'Đang diễn ra' },
+    'DA_KET_THUC': { cls: 'ended', text: 'Đã kết thúc' }
+  };
+
+  async function loadActivitiesTable() {
+    const result = await callApi('adminGetActivities', { adminSessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const tbody = document.getElementById('overview-activity-table');
+    const list = result.data.danhSach || [];
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--ink-soft);padding:24px;">Chưa có hoạt động nào.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(a => {
+      const st = STATUS_PILL[a.trangThai] || STATUS_PILL['DA_KET_THUC'];
+      return (
+        '<tr><td><code>' + escapeHtml(a.maHoatDong) + '</code></td>' +
+        '<td>' + escapeHtml(a.tenHoatDong) + '</td>' +
+        '<td>' + formatDateVN(a.ngayBatDau) + ' – ' + formatDateVN(a.ngayKetThuc) + '</td>' +
+        '<td>' + escapeHtml(a.diaDiem || '') + '</td>' +
+        '<td>' + a.soSaoQuyDinh + '</td>' +
+        '<td><span class="pill ' + st.cls + '">' + st.text + '</span></td></tr>'
+      );
+    }).join('');
+  }
+
+  // ============ TẠO HOẠT ĐỘNG ============
+  async function submitCreateActivity() {
+    const tenHoatDong = document.getElementById('create-name').value.trim();
+    const ngayBatDau = document.getElementById('create-start').value;
+    const ngayKetThuc = document.getElementById('create-end').value;
+    const diaDiem = document.getElementById('create-location').value.trim();
+    const soSaoQuyDinh = Number(document.getElementById('create-stars').value);
+    const resultBox = document.getElementById('create-result');
+    const btn = document.getElementById('create-submit-btn');
+
+    if (!tenHoatDong || !ngayBatDau || !ngayKetThuc || !soSaoQuyDinh || soSaoQuyDinh <= 0) {
+      resultBox.innerHTML = '<div class="result-box warning"><svg class="icon-svg"><use href="#icon-alert-circle" xlink:href="#icon-alert-circle"></use></svg> Vui lòng nhập đầy đủ tên, thời gian hợp lệ, và số sao lớn hơn 0.</div>';
+      return;
+    }
+
+    btn.disabled = true;
+    const result = await callApi('adminCreateActivity', { adminSessionToken, tenHoatDong, ngayBatDau, ngayKetThuc, diaDiem, soSaoQuyDinh });
+    btn.disabled = false;
+
+    if (!result.ok) {
+      if (result.error.code === 'UNAUTHORIZED') return handleAuthError(result);
+      resultBox.innerHTML = '<div class="result-box warning"><svg class="icon-svg"><use href="#icon-alert-circle" xlink:href="#icon-alert-circle"></use></svg> ' + escapeHtml(result.error.message) + '</div>';
+      return;
+    }
+
+    resultBox.innerHTML = '<div class="result-box success"><svg class="icon-svg"><use href="#icon-circle-check" xlink:href="#icon-circle-check"></use></svg> Đã tạo hoạt động thành công — mã hoạt động: <b>' + result.data.maHoatDong + '</b></div>';
+    document.getElementById('create-name').value = '';
+    document.getElementById('create-start').value = '';
+    document.getElementById('create-end').value = '';
+    document.getElementById('create-location').value = '';
+    document.getElementById('create-stars').value = '';
+  }
+
+  // ============ XÁC NHẬN THAM DỰ ============
+  async function loadActivitiesForSelect() {
+    const result = await callApi('adminGetActivities', { adminSessionToken });
+    if (!result.ok) return handleAuthError(result);
+    const select = document.getElementById('confirm-activity-select');
+    const list = result.data.danhSach || [];
+    select.innerHTML = '<option value="">— Chọn hoạt động —</option>' + list.map(a =>
+      '<option value="' + escapeHtml(a.maHoatDong) + '">' + escapeHtml(a.tenHoatDong) + ' (' + formatDateVN(a.ngayBatDau) + ')</option>'
+    ).join('');
+  }
+
+  const uploadZone = document.getElementById('upload-zone');
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) parseExcelFile(e.dataTransfer.files[0]);
+  });
+
+  function handleFileSelected(event) {
+    const file = event.target.files[0];
+    if (file) parseExcelFile(file);
+  }
+
+  function parseExcelFile(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+        // Tìm cột MSNV theo header dòng đầu (không cứng cột A, để chấp nhận template khác thứ tự cột).
+        const headerRow = rows[0] || [];
+        let msnvColIndex = headerRow.findIndex(h => String(h).trim().toUpperCase() === 'MSNV');
+        if (msnvColIndex === -1) msnvColIndex = 0; // fallback: cột đầu tiên nếu không tìm thấy header rõ ràng
+
+        const msnvList = [];
+        for (let i = 1; i < rows.length; i++) {
+          const cell = rows[i][msnvColIndex];
+          const msnv = String(cell || '').trim();
+          if (msnv) msnvList.push(msnv);
+        }
+
+        if (msnvList.length === 0) {
+          showToast('Không đọc được MSNV nào từ file. Vui lòng kiểm tra lại file mẫu.');
+          return;
+        }
+
+        parsedMsnvList = msnvList;
+        document.getElementById('upload-zone-text').textContent = file.name;
+        document.getElementById('parsed-count').textContent = msnvList.length;
+        document.getElementById('parsed-list').textContent = msnvList.join(', ');
+        document.getElementById('parsed-preview').classList.remove('hidden');
+        document.getElementById('confirm-result').innerHTML = '';
+      } catch (err) {
+        console.error(err);
+        showToast('Không đọc được file. Vui lòng kiểm tra đúng định dạng .xlsx/.xls.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function resetUpload() {
+    parsedMsnvList = [];
+    document.getElementById('file-input').value = '';
+    document.getElementById('upload-zone-text').textContent = 'Bấm để chọn file Excel, hoặc kéo thả vào đây';
+    document.getElementById('parsed-preview').classList.add('hidden');
+    document.getElementById('confirm-result').innerHTML = '';
+  }
+
+  async function submitConfirmAttendance() {
+    const maHoatDong = document.getElementById('confirm-activity-select').value;
+    const resultBox = document.getElementById('confirm-result');
+    const btn = document.getElementById('confirm-submit-btn');
+
+    if (!maHoatDong) {
+      resultBox.innerHTML = '<div class="result-box warning"><svg class="icon-svg"><use href="#icon-alert-circle" xlink:href="#icon-alert-circle"></use></svg> Vui lòng chọn hoạt động trước khi xác nhận.</div>';
+      return;
+    }
+    if (parsedMsnvList.length === 0) {
+      resultBox.innerHTML = '<div class="result-box warning"><svg class="icon-svg"><use href="#icon-alert-circle" xlink:href="#icon-alert-circle"></use></svg> Vui lòng chọn file Excel trước.</div>';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Đang xử lý...';
+    const result = await callApi('adminConfirmAttendance', { adminSessionToken, maHoatDong, danhSachMsnv: parsedMsnvList });
+    btn.disabled = false;
+    btn.innerHTML = '<svg class="icon-svg"><use href="#icon-upload" xlink:href="#icon-upload"></use></svg>Xác nhận và cộng sao';
+
+    if (!result.ok) {
+      if (result.error.code === 'UNAUTHORIZED') return handleAuthError(result);
+      resultBox.innerHTML = '<div class="result-box warning"><svg class="icon-svg"><use href="#icon-alert-circle" xlink:href="#icon-alert-circle"></use></svg> ' + escapeHtml(result.error.message) + '</div>';
+      return;
+    }
+
+    const d = result.data;
+    let html = '<div class="result-box success">';
+    html += '<div class="row"><span>Đã cộng sao thành công cho:</span><b>' + d.soLuongHopLe + ' người</b></div>';
+    if (d.msnvKhongHopLe.length > 0) {
+      html += '<div style="margin-top:8px;">MSNV không tồn tại trong hệ thống (' + d.msnvKhongHopLe.length + '): <ul>' + d.msnvKhongHopLe.map(m => '<li>' + escapeHtml(m) + '</li>').join('') + '</ul></div>';
+    }
+    if (d.msnvTrungLap.length > 0) {
+      html += '<div style="margin-top:8px;">MSNV đã được xác nhận trước đó, bỏ qua để tránh cộng trùng (' + d.msnvTrungLap.length + '): <ul>' + d.msnvTrungLap.map(m => '<li>' + escapeHtml(m) + '</li>').join('') + '</ul></div>';
+    }
+    html += '</div>';
+    resultBox.innerHTML = html;
+    resetUploadKeepResult();
+    loadOverview();
+  }
+
+  /** Giống resetUpload() nhưng KHÔNG xóa nội dung confirm-result, để Admin đọc được kết quả vừa xử lý. */
+  function resetUploadKeepResult() {
+    parsedMsnvList = [];
+    document.getElementById('file-input').value = '';
+    document.getElementById('upload-zone-text').textContent = 'Bấm để chọn file Excel, hoặc kéo thả vào đây';
+    document.getElementById('parsed-preview').classList.add('hidden');
+  }
+</script>
+</body>
+</html>
